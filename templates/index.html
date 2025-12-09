@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FruitCheck - Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes flash {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .flash-effect {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 60; pointer-events: none;
+            animation: flash 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex justify-center">
+
+    <!-- Mobile Container -->
+    <div class="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-y-auto no-scrollbar">
+        
+        <!-- Header -->
+        <div class="px-6 pt-8 pb-4 flex justify-between items-start bg-white sticky top-0 z-20">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">FruitCheck</h1>
+                <p class="text-xs text-gray-400">AI-Powered Quality Scanner</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="px-6 pb-24">
+            
+            <!-- Result Card (Hidden by Default) -->
+            <div id="result-container" class="hidden mb-6 bg-slate-800 rounded-3xl overflow-hidden relative shadow-lg">
+                <img id="captured-image" class="w-full h-64 object-cover opacity-80" src="" alt="Captured">
+                <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
+                    <p class="text-sm font-bold">Analysis Result:</p>
+                    <!-- Hasil AI akan muncul di sini -->
+                    <p id="ai-result-text" class="text-lg font-bold text-yellow-300">Menganalisis...</p>
+                    <p id="ai-confidence" class="text-xs text-slate-300"></p>
+                </div>
+                <button onclick="resetCamera()" class="absolute top-2 right-2 bg-black/50 p-2 rounded-full text-white hover:bg-red-500 transition">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Welcome Card -->
+            <div class="bg-white p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50 mb-6 flex items-center gap-4">
+                <div class="w-20 h-20 bg-blue-50 rounded-2xl flex-shrink-0 overflow-hidden p-2">
+                    <!-- Ganti gambar bear dengan placeholder online agar tidak error -->
+                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712009.png" alt="Bear" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        Hey there! <span class="text-xl">👋</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 leading-relaxed mt-1">
+                        Ready to check your fruits? Point your camera and I'll identify if they're fresh!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Status Indicator -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 flex items-center gap-4">
+                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+                    <i class="ph ph-check-circle text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <h3 class="text-sm font-bold text-slate-800">System Status</h3>
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Online</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400">Model loaded via Flask Python</p>
+                </div>
+                <i class="ph ph-sparkle text-yellow-400 text-xl"></i>
+            </div>
+        </div>
+
+        <!-- Scan Button -->
+        <div class="absolute bottom-8 left-0 w-full px-6 z-10">
+            <button onclick="openCamera()" class="w-full bg-[#5CA8F8] hover:bg-blue-500 text-white font-semibold py-4 rounded-full shadow-lg shadow-blue-300/50 flex items-center justify-center gap-2 transition-transform active:scale-95">
+                <i class="ph ph-camera text-xl"></i>
+                <span>Scan Buah</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Camera Modal Overlay -->
+    <div id="camera-modal" class="hidden fixed inset-0 z-50 bg-black flex flex-col">
+        <!-- Close Button -->
+        <button onclick="closeCamera()" class="absolute top-6 right-6 z-20 text-white bg-black/30 p-2 rounded-full backdrop-blur-md">
+            <i class="ph ph-x text-2xl"></i>
+        </button>
+
+        <!-- Camera Viewfinder -->
+        <div class="relative flex-1 flex items-center justify-center overflow-hidden">
+            <video id="video-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+            
+            <!-- Focus Frame -->
+            <div class="absolute inset-0 border-2 border-white/20 m-12 rounded-lg pointer-events-none"></div>
+            <p class="absolute bottom-20 text-white/80 text-sm font-medium bg-black/20 px-4 py-1 rounded-full backdrop-blur-sm">
+                Arahkan ke buah
+            </p>
+        </div>
+
+        <!-- Capture Controls -->
+        <div class="h-32 bg-black flex items-center justify-center pb-6">
+            <button onclick="takePictureAndAnalyze()" id="btn-capture" class="w-20 h-20 bg-white rounded-full border-4 border-gray-300 shadow-lg flex items-center justify-center active:scale-90 transition">
+                <div class="w-16 h-16 bg-white rounded-full border-2 border-black"></div>
+            </button>
+        </div>
+        
+        <!-- Hidden Canvas for Processing -->
+        <canvas id="camera-canvas" class="hidden"></canvas>
+    </div>
+
+    <div id="flash-overlay"></div>
+
+    <!-- Javascript Logic -->
+    <script>
+        const cameraModal = document.getElementById('camera-modal');
+        const videoElement = document.getElementById('video-feed');
+        const canvasElement = document.getElementById('camera-canvas');
+        const resultContainer = document.getElementById('result-container');
+        const capturedImage = document.getElementById('captured-image');
+        
+        const aiResultText = document.getElementById('ai-result-text');
+        const aiConfidence = document.getElementById('ai-confidence');
+        
+        let stream = null;
+
+        // 1. Buka Kamera
+        async function openCamera() {
+            try {
+                cameraModal.classList.remove('hidden');
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: "environment", // Kamera belakang
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+                videoElement.srcObject = stream;
+            } catch (err) {
+                console.error("Gagal membuka kamera:", err);
+                alert("Tidak dapat mengakses kamera. Coba di HP atau izinkan browser.");
+                closeCamera();
+            }
+        }
+
+        // 2. Tutup Kamera
+        function closeCamera() {
+            cameraModal.classList.add('hidden');
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        // 3. Ambil Foto & Kirim ke Python AI
+        async function takePictureAndAnalyze() {
+            // Efek Flash
+            const flashDiv = document.createElement('div');
+            flashDiv.className = 'flash-effect';
+            document.body.appendChild(flashDiv);
+            setTimeout(() => flashDiv.remove(), 500);
+
+            // Capture Frame ke Canvas
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+            const context = canvasElement.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+            
+            // Konversi ke Base64 Image
+            const imageData = canvasElement.toDataURL('image/png');
+            
+            // Tampilkan Preview dulu
+            capturedImage.src = imageData;
+            resultContainer.classList.remove('hidden');
+            aiResultText.innerText = "⏳ Menganalisis...";
+            aiResultText.className = "text-lg font-bold text-yellow-300";
+            aiConfidence.innerText = "";
+
+            // Matikan kamera lalu tutup modal
+            closeCamera();
+
+            // KIRIM KE BACKEND FLASK
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: imageData })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // Update UI dengan hasil AI
+                    aiResultText.innerText = result.label;
+                    aiConfidence.innerText = `Akurasi: ${result.confidence}`;
+
+                    if (result.is_fresh) {
+                        aiResultText.className = "text-lg font-bold text-green-400"; // Warna Hijau
+                    } else {
+                        aiResultText.className = "text-lg font-bold text-red-400"; // Warna Merah
+                    }
+                } else {
+                    aiResultText.innerText = "Gagal mendeteksi";
+                    aiResultText.className = "text-lg font-bold text-gray-400";
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                aiResultText.innerText = "Error Koneksi";
+            }
+        }
+
+        // 4. Reset
+        function resetCamera() {
+            resultContainer.classList.add('hidden');
+            capturedImage.src = "";
+        }
+    </script>
+</body>
+</html>
