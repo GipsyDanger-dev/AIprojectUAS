@@ -8,7 +8,7 @@ import io
 
 app = Flask(__name__)
 
-MODEL_PATH = 'model_buah_mobilenet32.h5'
+MODEL_PATH = 'model_buah_mobilenet50.h5'
 model = tf.keras.models.load_model(MODEL_PATH)
 
 CLASSES = [

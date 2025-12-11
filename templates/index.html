@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FruitCheck - Dashboard</title>
-    <!-- Tailwind CSS CDN -->
+    <title>FruitCheck AI</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
         body { font-family: 'Poppins', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+
         @keyframes flash {
             0% { opacity: 1; }
             100% { opacity: 0; }
@@ -25,143 +23,185 @@
             background: white; z-index: 60; pointer-events: none;
             animation: flash 0.3s ease-out forwards;
         }
+
+        @keyframes wave {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            30% { transform: rotate(14deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+            60% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .animate-wave {
+            animation: wave 2s infinite;
+            display: inline-block;
+            transform-origin: 70% 70%;
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex justify-center">
+<body class="bg-gray-100 min-h-screen flex justify-center items-start">
 
-    <!-- Mobile Container -->
-    <div class="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-y-auto no-scrollbar">
-        
-        <!-- Header -->
-        <div class="px-6 pt-8 pb-4 flex justify-between items-start bg-white sticky top-0 z-20">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">FruitCheck</h1>
-                <p class="text-xs text-gray-400">AI-Powered Quality Scanner</p>
+    <!-- CONTAINER UTAMA (Mobile View) -->
+    <div class="w-full max-w-md bg-gray-50 min-h-screen shadow-2xl relative overflow-y-auto no-scrollbar">
+
+        <div class="relative bg-gradient-to-br from-blue-500 to-blue-600 pt-12 pb-12 px-8 rounded-b-[2.5rem] shadow-xl z-20 overflow-hidden">
+            
+            <!-- Hiasan Background Header -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-10 -mb-5 blur-xl"></div>
+
+            <div class="relative flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-wide">FruitCheck</h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="bg-blue-400/30 text-blue-50 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-300/20 backdrop-blur-sm">
+                            AI-Powered Scanner
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Content -->
-        <div class="px-6 pb-24">
-            
-            <!-- Result Card (Hidden by Default) -->
-            <div id="result-container" class="hidden mb-6 bg-slate-800 rounded-3xl overflow-hidden relative shadow-lg">
+        <div class="px-6 -mt-8 pb-32 relative z-30 space-y-5">
+
+            <div id="result-container" class="hidden bg-slate-800 rounded-3xl overflow-hidden relative shadow-lg ring-4 ring-white transition-all duration-300">
                 <img id="captured-image" class="w-full h-64 object-cover opacity-80" src="" alt="Captured">
-                <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-                    <p class="text-sm font-bold">Analysis Result:</p>
-                    <!-- Hasil AI akan muncul di sini -->
-                    <p id="ai-result-text" class="text-lg font-bold text-yellow-300">Menganalisis...</p>
-                    <p id="ai-confidence" class="text-xs text-slate-300"></p>
+                
+                <!-- Overlay Teks -->
+                <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent text-white">
+                    <p class="text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-widest">Analysis Result</p>
+                    
+                    <!-- Hasil Dinamis dari JS -->
+                    <h2 id="ai-label" class="text-2xl font-bold text-yellow-400">Menganalisis...</h2>
+                    <p id="ai-conf" class="text-sm text-slate-300 mt-1 flex items-center gap-1">
+                        <i class="ph ph-spinner animate-spin"></i> Memproses data...
+                    </p>
                 </div>
-                <button onclick="resetCamera()" class="absolute top-2 right-2 bg-black/50 p-2 rounded-full text-white hover:bg-red-500 transition">
-                    <i class="ph ph-x"></i>
+
+                <!-- Tombol Tutup -->
+                <button onclick="resetCamera()" class="absolute top-3 right-3 bg-black/50 p-2 rounded-full text-white hover:bg-red-500 transition border border-white/20 backdrop-blur-md">
+                    <i class="ph ph-x text-lg"></i>
                 </button>
             </div>
 
-            <!-- Welcome Card -->
-            <div class="bg-white p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50 mb-6 flex items-center gap-4">
-                <div class="w-20 h-20 bg-blue-50 rounded-2xl flex-shrink-0 overflow-hidden p-2">
-                    <!-- Ganti gambar bear dengan placeholder online agar tidak error -->
+            <!-- 2. INTRO CARD (Bear) -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg shadow-blue-900/5 flex items-center gap-4 border border-blue-50">
+                <div class="w-16 h-16 bg-blue-50 rounded-2xl flex-shrink-0 overflow-hidden p-2 flex items-center justify-center">
+                    <!-- Icon Bear Online -->
                     <img src="https://cdn-icons-png.flaticon.com/512/4712/4712009.png" alt="Bear" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        Hey there! <span class="text-xl">👋</span>
+                        Hey there! <span class="animate-wave text-xl">👋</span>
                     </h2>
                     <p class="text-xs text-slate-500 leading-relaxed mt-1">
-                        Ready to check your fruits? Point your camera and I'll identify if they're fresh!
+                        Siapkan buahmu, arahkan kamera, dan biarkan AI mengecek kesegarannya!
                     </p>
                 </div>
             </div>
 
-            <!-- Status Indicator -->
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 flex items-center gap-4">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                    <i class="ph ph-check-circle text-xl"></i>
+            <!-- 3. SYSTEM STATUS CARD -->
+            <div class="bg-white p-5 rounded-3xl shadow-lg shadow-blue-900/5 flex items-center gap-4 border border-blue-50">
+                <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-500">
+                    <i class="ph ph-cpu text-2xl"></i>
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-0.5">
                         <h3 class="text-sm font-bold text-slate-800">System Status</h3>
-                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Online</span>
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Online</span>
                     </div>
-                    <p class="text-[10px] text-slate-400">Model loaded via Flask Python</p>
+                    <p class="text-[10px] text-slate-400">Model: MobileNetV2 (Python Flask)</p>
                 </div>
                 <i class="ph ph-sparkle text-yellow-400 text-xl"></i>
             </div>
+            
         </div>
 
-        <!-- Scan Button -->
-        <div class="absolute bottom-8 left-0 w-full px-6 z-10">
-            <button onclick="openCamera()" class="w-full bg-[#5CA8F8] hover:bg-blue-500 text-white font-semibold py-4 rounded-full shadow-lg shadow-blue-300/50 flex items-center justify-center gap-2 transition-transform active:scale-95">
-                <i class="ph ph-camera text-xl"></i>
-                <span>Scan Buah</span>
+        <!-- ================= FLOATING BUTTON (SCAN) ================= -->
+        <div class="absolute bottom-8 left-0 w-full px-6 z-40">
+            <button onclick="openCamera()" class="w-full bg-[#5CA8F8] hover:bg-blue-500 text-white font-semibold py-4 rounded-full shadow-lg shadow-blue-300/40 flex items-center justify-center gap-2 transition-transform active:scale-95 group">
+                <div class="bg-white/20 p-1.5 rounded-full group-hover:rotate-12 transition">
+                    <i class="ph ph-camera text-xl"></i>
+                </div>
+                <span class="tracking-wide">Scan Buah</span>
             </button>
         </div>
+
     </div>
 
-    <!-- Camera Modal Overlay -->
-    <div id="camera-modal" class="hidden fixed inset-0 z-50 bg-black flex flex-col">
+    <!-- ================= MODAL KAMERA (FULLSCREEN) ================= -->
+    <div id="camera-modal" class="hidden fixed inset-0 z-50 bg-black flex flex-col animate-fade-in">
+        
         <!-- Close Button -->
-        <button onclick="closeCamera()" class="absolute top-6 right-6 z-20 text-white bg-black/30 p-2 rounded-full backdrop-blur-md">
-            <i class="ph ph-x text-2xl"></i>
+        <button onclick="closeCamera()" class="absolute top-6 right-6 z-20 text-white bg-black/30 p-3 rounded-full backdrop-blur-md border border-white/10 hover:bg-red-500/80 transition">
+            <i class="ph ph-x text-xl"></i>
         </button>
 
-        <!-- Camera Viewfinder -->
-        <div class="relative flex-1 flex items-center justify-center overflow-hidden">
+        <!-- Viewfinder (Video) -->
+        <div class="relative flex-1 flex items-center justify-center overflow-hidden bg-gray-900">
             <video id="video-feed" autoplay playsinline class="w-full h-full object-cover"></video>
             
-            <!-- Focus Frame -->
-            <div class="absolute inset-0 border-2 border-white/20 m-12 rounded-lg pointer-events-none"></div>
-            <p class="absolute bottom-20 text-white/80 text-sm font-medium bg-black/20 px-4 py-1 rounded-full backdrop-blur-sm">
-                Arahkan ke buah
-            </p>
+            <!-- Grid / Focus Box Overlay -->
+            <div class="absolute inset-0 border-2 border-white/20 m-8 rounded-2xl pointer-events-none flex flex-col items-center justify-end pb-12">
+                <!-- Sudut-sudut fokus -->
+                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl -mt-1 -ml-1"></div>
+                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl -mt-1 -mr-1"></div>
+                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl -mb-1 -ml-1"></div>
+                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl -mb-1 -mr-1"></div>
+
+                <p class="text-white/90 text-sm font-medium bg-black/40 px-6 py-2 rounded-full backdrop-blur-md border border-white/10">
+                    Posisikan buah di dalam kotak
+                </p>
+            </div>
         </div>
 
-        <!-- Capture Controls -->
-        <div class="h-32 bg-black flex items-center justify-center pb-6">
-            <button onclick="takePictureAndAnalyze()" id="btn-capture" class="w-20 h-20 bg-white rounded-full border-4 border-gray-300 shadow-lg flex items-center justify-center active:scale-90 transition">
-                <div class="w-16 h-16 bg-white rounded-full border-2 border-black"></div>
+        <!-- Tombol Shutter -->
+        <div class="h-36 bg-black flex items-center justify-center pb-8">
+            <button onclick="takePictureAndAnalyze()" id="btn-capture" class="w-20 h-20 bg-white rounded-full border-4 border-gray-400 shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center active:scale-90 transition duration-200">
+                <div class="w-16 h-16 bg-white rounded-full border-2 border-black/10"></div>
             </button>
         </div>
         
-        <!-- Hidden Canvas for Processing -->
+        <!-- Canvas Tersembunyi -->
         <canvas id="camera-canvas" class="hidden"></canvas>
     </div>
 
-    <div id="flash-overlay"></div>
-
-    <!-- Javascript Logic -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         const cameraModal = document.getElementById('camera-modal');
         const videoElement = document.getElementById('video-feed');
         const canvasElement = document.getElementById('camera-canvas');
+        
         const resultContainer = document.getElementById('result-container');
         const capturedImage = document.getElementById('captured-image');
-        
-        const aiResultText = document.getElementById('ai-result-text');
-        const aiConfidence = document.getElementById('ai-confidence');
+        const aiLabel = document.getElementById('ai-label');
+        const aiConf = document.getElementById('ai-conf');
         
         let stream = null;
 
-        // 1. Buka Kamera
         async function openCamera() {
             try {
                 cameraModal.classList.remove('hidden');
+                // Gunakan facingMode: environment untuk kamera belakang HP
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
-                        facingMode: "environment", // Kamera belakang
+                        facingMode: "environment", 
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     }
                 });
+
                 videoElement.srcObject = stream;
             } catch (err) {
-                console.error("Gagal membuka kamera:", err);
-                alert("Tidak dapat mengakses kamera. Coba di HP atau izinkan browser.");
+                console.error("Error:", err);
+                alert("Tidak dapat akses kamera. Pastikan izin browser aktif atau gunakan HTTPS/Localhost.");
                 closeCamera();
             }
         }
 
-        // 2. Tutup Kamera
+        // 2. TUTUP KAMERA
         function closeCamera() {
             cameraModal.classList.add('hidden');
             if (stream) {
@@ -170,34 +210,36 @@
             }
         }
 
-        // 3. Ambil Foto & Kirim ke Python AI
+        // 3. CAPTURE & ANALYZE
         async function takePictureAndAnalyze() {
-            // Efek Flash
-            const flashDiv = document.createElement('div');
-            flashDiv.className = 'flash-effect';
-            document.body.appendChild(flashDiv);
-            setTimeout(() => flashDiv.remove(), 500);
+            // Animasi Flash
+            const flash = document.createElement('div');
+            flash.className = 'flash-effect';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 500);
 
-            // Capture Frame ke Canvas
+            // Gambar Video ke Canvas
             canvasElement.width = videoElement.videoWidth;
             canvasElement.height = videoElement.videoHeight;
             const context = canvasElement.getContext('2d');
             context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
             
-            // Konversi ke Base64 Image
-            const imageData = canvasElement.toDataURL('image/png');
+            // Convert to Base64
+            const imageData = canvasElement.toDataURL('image/jpeg', 0.8);
             
-            // Tampilkan Preview dulu
+            // Tampilkan Preview Loading
             capturedImage.src = imageData;
             resultContainer.classList.remove('hidden');
-            aiResultText.innerText = "⏳ Menganalisis...";
-            aiResultText.className = "text-lg font-bold text-yellow-300";
-            aiConfidence.innerText = "";
+            
+            // Reset UI Loading
+            aiLabel.innerText = "Menganalisis...";
+            aiLabel.className = "text-2xl font-bold text-yellow-400 animate-pulse";
+            aiConf.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Mengirim data ke AI...';
 
-            // Matikan kamera lalu tutup modal
+            // Matikan Kamera
             closeCamera();
 
-            // KIRIM KE BACKEND FLASK
+            // === KIRIM KE PYTHON FLASK ===
             try {
                 const response = await fetch('/predict', {
                     method: 'POST',
@@ -208,27 +250,29 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // Update UI dengan hasil AI
-                    aiResultText.innerText = result.label;
-                    aiConfidence.innerText = `Akurasi: ${result.confidence}`;
+                    // Tampilkan Hasil
+                    aiLabel.innerText = result.label;
+                    aiConf.innerText = `Akurasi Deteksi: ${result.confidence}`;
 
+                    // Warna Teks
                     if (result.is_fresh) {
-                        aiResultText.className = "text-lg font-bold text-green-400"; // Warna Hijau
+                        aiLabel.className = "text-2xl font-bold text-green-400 drop-shadow-md"; 
                     } else {
-                        aiResultText.className = "text-lg font-bold text-red-400"; // Warna Merah
+                        aiLabel.className = "text-2xl font-bold text-red-500 drop-shadow-md"; 
                     }
                 } else {
-                    aiResultText.innerText = "Gagal mendeteksi";
-                    aiResultText.className = "text-lg font-bold text-gray-400";
+                    aiLabel.innerText = "Gagal";
+                    aiConf.innerText = "Objek tidak terdeteksi";
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                aiResultText.innerText = "Error Koneksi";
+                aiLabel.innerText = "Error Koneksi";
+                aiConf.innerText = "Cek terminal server Flask";
             }
         }
 
-        // 4. Reset
+        // 4. RESET TOMBOL CLOSE
         function resetCamera() {
             resultContainer.classList.add('hidden');
             capturedImage.src = "";
