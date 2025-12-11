@@ -43,7 +43,6 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex justify-center items-start">
 
-    <!-- CONTAINER UTAMA (Mobile View) -->
     <div class="w-full max-w-md bg-gray-50 min-h-screen shadow-2xl relative overflow-y-auto no-scrollbar">
 
         <!-- HEADER -->
@@ -127,7 +126,7 @@
 
     </div>
 
-    <!-- ================= MODAL KAMERA (FULLSCREEN) ================= -->
+    <!-- MODAL KAMERA -->
     <div id="camera-modal" class="hidden fixed inset-0 z-50 bg-black flex flex-col animate-fade-in">
         
         <!-- Close Button -->
@@ -138,11 +137,7 @@
         <!-- Viewfinder (Video) -->
         <div class="relative flex-1 flex items-center justify-center overflow-hidden bg-black">
             <video id="video-feed" autoplay playsinline class="w-full h-full object-cover opacity-80"></video>
-            
-            <!-- OVERLAY CROP (VISUAL GUIDE) -->
-            <!-- Kotak kuning di tengah, sekelilingnya gelap -->
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <!-- Kotak Fokus Persegi -->
                 <div class="w-72 h-72 border-2 border-yellow-400 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] z-10 flex flex-col justify-end items-center pb-4">
                     <p class="text-white/90 text-xs font-medium bg-black/50 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
                         Letakkan buah di sini
@@ -157,12 +152,9 @@
                 <div class="w-16 h-16 bg-white rounded-full border-2 border-black/10"></div>
             </button>
         </div>
-        
-        <!-- Canvas Tersembunyi (Untuk Crop) -->
         <canvas id="camera-canvas" class="hidden"></canvas>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
         const cameraModal = document.getElementById('camera-modal');
         const videoElement = document.getElementById('video-feed');
@@ -175,13 +167,13 @@
         
         let stream = null;
 
-        // 1. BUKA KAMERA
+        // BUKA KAMERA
         async function openCamera() {
             try {
                 cameraModal.classList.remove('hidden');
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
-                        facingMode: "environment", // Kamera Belakang
+                        facingMode: "environment", 
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     }
@@ -194,7 +186,6 @@
             }
         }
 
-        // 2. TUTUP KAMERA
         function closeCamera() {
             cameraModal.classList.add('hidden');
             if (stream) {
@@ -203,39 +194,33 @@
             }
         }
 
-        // 3. CAPTURE & CROP (CENTER CROP)
+        // foto
         async function takePictureAndAnalyze() {
-            // Flash Effect
             const flash = document.createElement('div');
             flash.className = 'flash-effect';
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 500);
 
-            // --- LOGIKA CROP DI SINI ---
-            // Kita ingin memotong bagian tengah video menjadi persegi (Square)
+
             const videoW = videoElement.videoWidth;
             const videoH = videoElement.videoHeight;
             
-            // Tentukan sisi kotak persegi (mengikuti sisi terpendek video)
+
             const size = Math.min(videoW, videoH);
-            
-            // Hitung koordinat awal (titik pojok kiri atas crop) agar di tengah
+
             const startX = (videoW - size) / 2;
             const startY = (videoH - size) / 2;
 
-            // Set ukuran canvas menjadi 224x224 (Standar MobileNet)
             canvasElement.width = 224;
             canvasElement.height = 224;
             
             const context = canvasElement.getContext('2d');
 
-            // syntax: drawImage(source, srcX, srcY, srcW, srcH, destX, destY, destW, destH)
             context.drawImage(videoElement, startX, startY, size, size, 0, 0, 224, 224);
-            
-            // Hasil sudah crop tengah & resize 224x224
+
             const imageData = canvasElement.toDataURL('image/jpeg', 0.9);
             
-            // --- UI HANDLING ---
+            //nampilin hasil foto
             capturedImage.src = imageData;
             resultContainer.classList.remove('hidden');
             
@@ -245,7 +230,7 @@
 
             closeCamera();
 
-            // --- KIRIM KE PYTHON FLASK ---
+            // kirim ke server flask
             try {
                 const response = await fetch('/predict', {
                     method: 'POST',
