@@ -46,9 +46,8 @@
     <!-- CONTAINER UTAMA (Mobile View) -->
     <div class="w-full max-w-md bg-gray-50 min-h-screen shadow-2xl relative overflow-y-auto no-scrollbar">
 
+        <!-- HEADER -->
         <div class="relative bg-gradient-to-br from-blue-500 to-blue-600 pt-12 pb-12 px-8 rounded-b-[2.5rem] shadow-xl z-20 overflow-hidden">
-            
-            <!-- Hiasan Background Header -->
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
             <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-10 -mb-5 blur-xl"></div>
 
@@ -64,32 +63,29 @@
             </div>
         </div>
 
+        <!-- KONTEN -->
         <div class="px-6 -mt-8 pb-32 relative z-30 space-y-5">
 
+            <!-- HASIL SCAN -->
             <div id="result-container" class="hidden bg-slate-800 rounded-3xl overflow-hidden relative shadow-lg ring-4 ring-white transition-all duration-300">
                 <img id="captured-image" class="w-full h-64 object-cover opacity-80" src="" alt="Captured">
                 
-                <!-- Overlay Teks -->
                 <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent text-white">
                     <p class="text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-widest">Analysis Result</p>
-                    
-                    <!-- Hasil Dinamis dari JS -->
                     <h2 id="ai-label" class="text-2xl font-bold text-yellow-400">Menganalisis...</h2>
                     <p id="ai-conf" class="text-sm text-slate-300 mt-1 flex items-center gap-1">
                         <i class="ph ph-spinner animate-spin"></i> Memproses data...
                     </p>
                 </div>
 
-                <!-- Tombol Tutup -->
                 <button onclick="resetCamera()" class="absolute top-3 right-3 bg-black/50 p-2 rounded-full text-white hover:bg-red-500 transition border border-white/20 backdrop-blur-md">
                     <i class="ph ph-x text-lg"></i>
                 </button>
             </div>
 
-            <!-- 2. INTRO CARD (Bear) -->
+            <!-- INTRO CARD -->
             <div class="bg-white p-6 rounded-3xl shadow-lg shadow-blue-900/5 flex items-center gap-4 border border-blue-50">
                 <div class="w-16 h-16 bg-blue-50 rounded-2xl flex-shrink-0 overflow-hidden p-2 flex items-center justify-center">
-                    <!-- Icon Bear Online -->
                     <img src="https://cdn-icons-png.flaticon.com/512/4712/4712009.png" alt="Bear" class="w-full h-full object-contain">
                 </div>
                 <div>
@@ -102,7 +98,7 @@
                 </div>
             </div>
 
-            <!-- 3. SYSTEM STATUS CARD -->
+            <!-- SYSTEM STATUS -->
             <div class="bg-white p-5 rounded-3xl shadow-lg shadow-blue-900/5 flex items-center gap-4 border border-blue-50">
                 <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-500">
                     <i class="ph ph-cpu text-2xl"></i>
@@ -119,7 +115,7 @@
             
         </div>
 
-        <!-- ================= FLOATING BUTTON (SCAN) ================= -->
+        <!-- TOMBOL FLOATING SCAN -->
         <div class="absolute bottom-8 left-0 w-full px-6 z-40">
             <button onclick="openCamera()" class="w-full bg-[#5CA8F8] hover:bg-blue-500 text-white font-semibold py-4 rounded-full shadow-lg shadow-blue-300/40 flex items-center justify-center gap-2 transition-transform active:scale-95 group">
                 <div class="bg-white/20 p-1.5 rounded-full group-hover:rotate-12 transition">
@@ -140,31 +136,29 @@
         </button>
 
         <!-- Viewfinder (Video) -->
-        <div class="relative flex-1 flex items-center justify-center overflow-hidden bg-gray-900">
-            <video id="video-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+        <div class="relative flex-1 flex items-center justify-center overflow-hidden bg-black">
+            <video id="video-feed" autoplay playsinline class="w-full h-full object-cover opacity-80"></video>
             
-            <!-- Grid / Focus Box Overlay -->
-            <div class="absolute inset-0 border-2 border-white/20 m-8 rounded-2xl pointer-events-none flex flex-col items-center justify-end pb-12">
-                <!-- Sudut-sudut fokus -->
-                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl -mt-1 -ml-1"></div>
-                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl -mt-1 -mr-1"></div>
-                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl -mb-1 -ml-1"></div>
-                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl -mb-1 -mr-1"></div>
-
-                <p class="text-white/90 text-sm font-medium bg-black/40 px-6 py-2 rounded-full backdrop-blur-md border border-white/10">
-                    Posisikan buah di dalam kotak
-                </p>
+            <!-- OVERLAY CROP (VISUAL GUIDE) -->
+            <!-- Kotak kuning di tengah, sekelilingnya gelap -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <!-- Kotak Fokus Persegi -->
+                <div class="w-72 h-72 border-2 border-yellow-400 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] z-10 flex flex-col justify-end items-center pb-4">
+                    <p class="text-white/90 text-xs font-medium bg-black/50 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
+                        Letakkan buah di sini
+                    </p>
+                </div>
             </div>
         </div>
 
         <!-- Tombol Shutter -->
-        <div class="h-36 bg-black flex items-center justify-center pb-8">
+        <div class="h-36 bg-black flex items-center justify-center pb-8 z-20">
             <button onclick="takePictureAndAnalyze()" id="btn-capture" class="w-20 h-20 bg-white rounded-full border-4 border-gray-400 shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center active:scale-90 transition duration-200">
                 <div class="w-16 h-16 bg-white rounded-full border-2 border-black/10"></div>
             </button>
         </div>
         
-        <!-- Canvas Tersembunyi -->
+        <!-- Canvas Tersembunyi (Untuk Crop) -->
         <canvas id="camera-canvas" class="hidden"></canvas>
     </div>
 
@@ -181,22 +175,21 @@
         
         let stream = null;
 
+        // 1. BUKA KAMERA
         async function openCamera() {
             try {
                 cameraModal.classList.remove('hidden');
-                // Gunakan facingMode: environment untuk kamera belakang HP
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: { 
-                        facingMode: "environment", 
+                        facingMode: "environment", // Kamera Belakang
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     }
                 });
-
                 videoElement.srcObject = stream;
             } catch (err) {
                 console.error("Error:", err);
-                alert("Tidak dapat akses kamera. Pastikan izin browser aktif atau gunakan HTTPS/Localhost.");
+                alert("Tidak dapat akses kamera. Pastikan izin browser aktif atau gunakan HTTPS.");
                 closeCamera();
             }
         }
@@ -210,36 +203,49 @@
             }
         }
 
-        // 3. CAPTURE & ANALYZE
+        // 3. CAPTURE & CROP (CENTER CROP)
         async function takePictureAndAnalyze() {
-            // Animasi Flash
+            // Flash Effect
             const flash = document.createElement('div');
             flash.className = 'flash-effect';
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 500);
 
-            // Gambar Video ke Canvas
-            canvasElement.width = videoElement.videoWidth;
-            canvasElement.height = videoElement.videoHeight;
+            // --- LOGIKA CROP DI SINI ---
+            // Kita ingin memotong bagian tengah video menjadi persegi (Square)
+            const videoW = videoElement.videoWidth;
+            const videoH = videoElement.videoHeight;
+            
+            // Tentukan sisi kotak persegi (mengikuti sisi terpendek video)
+            const size = Math.min(videoW, videoH);
+            
+            // Hitung koordinat awal (titik pojok kiri atas crop) agar di tengah
+            const startX = (videoW - size) / 2;
+            const startY = (videoH - size) / 2;
+
+            // Set ukuran canvas menjadi 224x224 (Standar MobileNet)
+            canvasElement.width = 224;
+            canvasElement.height = 224;
+            
             const context = canvasElement.getContext('2d');
-            context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+            // syntax: drawImage(source, srcX, srcY, srcW, srcH, destX, destY, destW, destH)
+            context.drawImage(videoElement, startX, startY, size, size, 0, 0, 224, 224);
             
-            // Convert to Base64
-            const imageData = canvasElement.toDataURL('image/jpeg', 0.8);
+            // Hasil sudah crop tengah & resize 224x224
+            const imageData = canvasElement.toDataURL('image/jpeg', 0.9);
             
-            // Tampilkan Preview Loading
+            // --- UI HANDLING ---
             capturedImage.src = imageData;
             resultContainer.classList.remove('hidden');
             
-            // Reset UI Loading
             aiLabel.innerText = "Menganalisis...";
             aiLabel.className = "text-2xl font-bold text-yellow-400 animate-pulse";
-            aiConf.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Mengirim data ke AI...';
+            aiConf.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Mengirim ke Server...';
 
-            // Matikan Kamera
             closeCamera();
 
-            // === KIRIM KE PYTHON FLASK ===
+            // --- KIRIM KE PYTHON FLASK ---
             try {
                 const response = await fetch('/predict', {
                     method: 'POST',
@@ -250,11 +256,9 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // Tampilkan Hasil
                     aiLabel.innerText = result.label;
                     aiConf.innerText = `Akurasi Deteksi: ${result.confidence}`;
 
-                    // Warna Teks
                     if (result.is_fresh) {
                         aiLabel.className = "text-2xl font-bold text-green-400 drop-shadow-md"; 
                     } else {
@@ -272,7 +276,6 @@
             }
         }
 
-        // 4. RESET TOMBOL CLOSE
         function resetCamera() {
             resultContainer.classList.add('hidden');
             capturedImage.src = "";
